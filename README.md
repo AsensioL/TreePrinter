@@ -19,13 +19,15 @@ Copy the BTNode Class (from the `src` folder) into your project (I hope there ar
 You will need two things (you most likely have something similar to them if you are building this kind of tree):
 1. A getChildren member function of your node class that
 1.1 takes no parameters, and
-1.2 returns a constant reference to a standard list of pointer to its children (aka `const std::list<YourClass *> & YourClass::getChildrenFunction()`)
+1.2 returns a constant reference to a standard list of pointer to its children
+(aka `const std::list<YourClass *> & YourClass::getChildrenFunction()`)
 2. A getData member function of your node class that
 2.1 takes no parameters, and
-2.2 returns a constant reference to a standard string of its content (aka `const std::string & YourClass::getStringFunction()`)
+2.2 returns a constant reference to a standard string of its content
+(aka `const std::string & YourClass::getStringFunction()`)
 
 ### Step 3
-Set up the templated in *your code* before using it:
+Set up the templated class in *your code* before using it:
 ```cpp
 BTNode<YourClass>::initializeClass(YourClass::getChildrenFunction, YourClass::getStringFunction);
 ```
@@ -49,7 +51,7 @@ a b c  ^  d
       / \  
       e f 
 ```
-Example 2 (I know there is a bug, I will fix it on the future)
+Example 2 (I know there is a bug in spacing, I will fix it on the future)
 ```text
         _________________me___________________      
        /                 /      \    \        \     
