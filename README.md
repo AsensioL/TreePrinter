@@ -33,8 +33,8 @@ BTNode<YourClass>::initializeClass(YourClass::getChildrenFunction, YourClass::ge
 ### Step 4
 Initialize the BTNode with a pointer to your class, and ask it to print the tree:
 ```cpp
-	BTNode<YourClass> printer(headNodeOfYourTree);
-	printer.printTree();
+BTNode<YourClass> printer(headNodeOfYourTree);
+printer.printTree();
 ```
 
 ## Results
