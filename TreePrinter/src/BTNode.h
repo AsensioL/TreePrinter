@@ -3,6 +3,14 @@
  *
  *  Created on: 5 sept. 2019
  *      Author: asens
+ *
+ *  Known bugs:
+ *    * Spacing problems when subnodes above the bottom of the tree have no children
+ *    * If the parent node is longer than the combination of the children, it will crash
+ *
+ *  Minor problems:
+ *    * Placement of '\' feels skewed to the right
+ *    * The amount of underscores sometimes feels unbalanced
  */
 
 #ifndef SRC_BTNODE_H_
