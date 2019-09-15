@@ -51,9 +51,9 @@ a b c  ^  d
 ```
 Example 2 (I know there is a bug in spacing, I will fix it on the future)
 ```text
-        _________________me___________________      
-       /                 /      \    \        \     
-   __Paul____          Anna   SarahEmma     Tina_   
-  /          \           |                 /     \  
-Kevin ElloineOOOOOOOO Anthony            Susan Jason
+      _______________me_______________      
+     /           /      \    \        \     
+   _Paul_       Anna  Sarah Emma    _Tina   
+  /      \       |                 /     \  
+Kevin Elloine Anthony            Susan Jason
 ```
