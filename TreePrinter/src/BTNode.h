@@ -5,12 +5,10 @@
  *      Author: asens
  *
  *  Known bugs:
- *    * Spacing problems when subnodes above the bottom of the tree have no children
  *    * If the parent node is longer than the combination of the children, it will crash
  *
  *  Minor problems:
- *    * Placement of '\' feels skewed to the right
- *    * The amount of underscores sometimes feels unbalanced
+ *    * Placement of '/' feels skewed to the left on words with even characters to the left of its parent
  */
 
 #ifndef SRC_BTNODE_H_
@@ -82,7 +80,7 @@ private:
 	
 	bool CisParentFirstCharacter(lluint c, std::list<BTNode *> * level);
 	bool CisBetweenChildrenAndParent(lluint c, std::list<BTNode *> * parent);
-	bool CisCenterParent(lluint c, std::list<BTNode *> * level);
+	bool CisCenterChildren(lluint c, std::list<BTNode *> * children);
 	int parentPositionRelToChildren(lluint c, std::list<BTNode *> * parent, std::list<BTNode *> * children);
 	
 	

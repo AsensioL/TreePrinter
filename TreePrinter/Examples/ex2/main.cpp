@@ -19,7 +19,7 @@ int main() {
 	BasicNode * childR   = new BasicNode("Tina");
 
 	BasicNode * childLL  = new BasicNode("Kevin");
-	BasicNode * childLR  = new BasicNode("ElloineOOOOOOOO");
+	BasicNode * childLR  = new BasicNode("Elloine");
 
 	BasicNode * childCLC = new BasicNode("Anthony");
 

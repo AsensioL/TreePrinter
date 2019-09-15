@@ -273,13 +273,13 @@ void BTNode<T>::assignPositionsToNodes(std::vector<std::list<BTNode *> *> & leve
 	lluint c = 0;
 	for (BTNode * & nd : *(levels.back()))
 	{
-		nd->_fcp = c;
-		nd->_lcp = c + nd->_wself - 1;
-		nd->_mcp = (nd->_fcp + nd->_lcp)/2;
+		nd->_mcp = c + (nd->_wself - 1)/2;
+		nd->_fcp = nd->_mcp - (nd->_wself - 1)  / 2;
+		nd->_lcp = nd->_fcp + nd->_wself -1;
 
 		nd->_fbp = nd->_fcp;
 		nd->_lbp = nd->_lcp;
-		nd->_mbp = (nd->_fbp + nd->_lbp)/2;
+		nd->_mbp = nd->_mcp;
 		c        = c + nd->_wself + 1;
 	}
 	auto it = levels.rbegin();
@@ -293,7 +293,7 @@ void BTNode<T>::assignPositionsToNodes(std::vector<std::list<BTNode *> *> & leve
 			nd->_mbp = (nd->_fbp + nd->_lbp) / 2;
 
 			nd->_mcp = (nd->_children.front()->_mcp + nd->_children.back()->_mcp) / 2;
-			nd->_fcp = nd->_mcp - nd->_wself / 2;
+			nd->_fcp = nd->_mcp - (nd->_wself - 1)  / 2;
 			nd->_lcp = nd->_fcp + nd->_wself -1;
 		}
 	}
@@ -367,7 +367,7 @@ template <class T>
 void BTNode<T>::printPreline(lluint ln, std::vector<std::list<BTNode *> *> & levels) {
 	for (lluint c = 0; c < _wblock; c++)
 	{
-		if (CisCenterParent(c, levels[ln]))
+		if (CisCenterChildren(c, levels[ln]))
 		{
 			switch (parentPositionRelToChildren(c, levels[ln-1], levels[ln]))
 			{
@@ -391,9 +391,9 @@ void BTNode<T>::printPreline(lluint ln, std::vector<std::list<BTNode *> *> & lev
 }
 
 template <class T>
-bool BTNode<T>::CisCenterParent(lluint c, std::list<BTNode *> * level)
+bool BTNode<T>::CisCenterChildren(lluint c, std::list<BTNode *> * children)
 {
-	for (BTNode * & nd : * level)
+	for (BTNode * & nd : * children)
 	{
 		if (nd->_mcp == c && !nd->_fake)
 			return true;
@@ -406,14 +406,14 @@ int BTNode<T>::parentPositionRelToChildren(lluint c, std::list<BTNode *> * paren
 {
 	BTNode * dad = nullptr;
 	BTNode * kid = nullptr;
-	for (BTNode * & nd : *parent)
+	for (BTNode * & nd : *parent) // Find Parent
 	{
 		if ((c >= nd->_fbp) && (c <= nd->_lbp))
 		{
 			dad = nd;
 		}
 	}
-	for (BTNode * & nd : *children)
+	for (BTNode * & nd : *children) // Find children
 	{
 		if ((c >= nd->_fbp) && (c <= nd->_lbp))
 		{
