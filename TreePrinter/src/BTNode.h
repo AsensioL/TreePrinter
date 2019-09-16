@@ -5,7 +5,6 @@
  *      Author: asens
  *
  *  Known bugs:
- *    * If the parent node is longer than the combination of the children, it will crash
  *
  *  Minor problems:
  *    * Placement of '/' feels skewed to the left on words with even characters to the left of its parent
@@ -31,7 +30,7 @@ class BTNode {
 	static dataGetterFcn	 dataGetter;
 
 	const std::list<T *> & getChildren();
-	const std::string    & getData();
+	const std::string      getData();
 
 
 	/**
@@ -65,12 +64,11 @@ private:
 	lluint _mcp; // Middle Character Position
 	lluint _fbp; // First  Block     Position
 	lluint _lbp; // Last   Block     Position
-	lluint _mbp; // Middle Block     Position
 
 	bool _fake;
 
 	void groupNodesByDepth(     std::vector<std::list<BTNode *> *> & levels, BTNode * head);
-	void assignPositionsToNodes(std::vector<std::list<BTNode *> *> & levels);
+	lluint assignPositionsToNodes(lluint blockStart);
 	
 	void printLine(lluint ln,    std::vector<std::list<BTNode *> *> & levels);
 	void printPreline(lluint ln, std::vector<std::list<BTNode *> *> & levels);

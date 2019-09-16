@@ -33,11 +33,13 @@ const std::list<T *> & BTNode<T>::getChildren() {
 }
 
 template <class T>
-const std::string & BTNode<T>::getData() {
+const std::string BTNode<T>::getData() {
+	std::string str;
 	if (!_fake)
-		return CALL_MEMBER_FN(*_nd,dataGetter)();
+		str = CALL_MEMBER_FN(*_nd,dataGetter)();
 	else
-		return std::move(std::string(_wself, ' '));
+		str = std::string(_wself, ' ');
+	return str;
 }
 
 
@@ -60,7 +62,6 @@ BTNode<T>::BTNode(lluint len, lluint depth, lluint height) {
 
 	_fbp = 0;
 	_lbp = 0;
-	_mbp = 0;
 
 	_wself  = len;
 	_wchild = 0;
@@ -84,7 +85,6 @@ BTNode<T>::BTNode(T* node) {
 
 	_fbp = 0;
 	_lbp = 0;
-	_mbp = 0;
 
 	_wself  = getData().length();
 	_wchild = 0;
@@ -214,7 +214,7 @@ void BTNode<T>::printTree() {
 	groupNodesByDepth(levels, this);
 	
 	// Load the information of where each node goes into the nodes
-	assignPositionsToNodes(levels);
+	assignPositionsToNodes(0);
 	
 	// --- Printing algorithm ---
 	
@@ -267,36 +267,43 @@ void BTNode<T>::groupNodesByDepth(std::vector<std::list<BTNode *> *> & levels, B
 }
 
 template <class T>
-void BTNode<T>::assignPositionsToNodes(std::vector<std::list<BTNode *> *> & levels)
+lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
 {
-	if (levels.empty()) {return;}
-	lluint c = 0;
-	for (BTNode * & nd : *(levels.back()))
+	// Block Data
+	_fbp = blockStart;
+	_lbp = blockStart + _wblock - 1;
+	
+	if (_wself >= _wchild)
 	{
-		nd->_mcp = c + (nd->_wself - 1)/2;
-		nd->_fcp = nd->_mcp - (nd->_wself - 1)  / 2;
-		nd->_lcp = nd->_fcp + nd->_wself -1;
-
-		nd->_fbp = nd->_fcp;
-		nd->_lbp = nd->_lcp;
-		nd->_mbp = nd->_mcp;
-		c        = c + nd->_wself + 1;
-	}
-	auto it = levels.rbegin();
-	++it;
-	for (; it != levels.rend(); ++it) // For each other layer in reverse order
-	{
-		for (BTNode * & nd : **it) // And each of its nodes
+		// Do self first
+		_fcp = blockStart + (_wblock - _wself) / 2;
+		_lcp = _fcp + _wself -1;
+		_mcp = (_fcp + _lcp) / 2; // left aligning;
+		
+		// Then, do the children
+		lluint childrenBlockStart = blockStart + (_wblock - _wchild) / 2;
+		for (BTNode * & nd : _children)
 		{
-			nd->_fbp = nd->_children.front()->_fcp;
-			nd->_lbp = nd->_children.back( )->_lcp;
-			nd->_mbp = (nd->_fbp + nd->_lbp) / 2;
-
-			nd->_mcp = (nd->_children.front()->_mcp + nd->_children.back()->_mcp) / 2;
-			nd->_fcp = nd->_mcp - (nd->_wself - 1)  / 2;
-			nd->_lcp = nd->_fcp + nd->_wself -1;
+			childrenBlockStart = nd->assignPositionsToNodes(childrenBlockStart);
 		}
 	}
+	else
+	{
+		// Do the children first
+		lluint childrenBlockStart = blockStart + (_wblock - _wchild) / 2;
+		for (BTNode * & nd : _children)
+		{
+			childrenBlockStart = nd->assignPositionsToNodes(childrenBlockStart);
+		}
+
+		// Then, do self
+		_mcp = (_children.front()->_mcp + _children.back()->_mcp) / 2;
+		_fcp = _mcp - (_wself - 1)  / 2; // left aligning;
+		_lcp = _fcp + _wself -1;
+	}
+	
+	// Return start of the next block
+	return blockStart + _wblock + 1;
 }
 
 template <class T>

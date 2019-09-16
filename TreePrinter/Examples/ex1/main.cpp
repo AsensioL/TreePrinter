@@ -38,7 +38,7 @@ int main() {
 	childRC->addChildren(childRCL);
 	childRC->addChildren(childRCC);
 
-	BTNode<BasicNode>::initializeClass(BasicNode::getChildren, BasicNode::getData);
+	BTNode<BasicNode>::initializeClass(&BasicNode::getChildren, &BasicNode::getData);
 	BTNode<BasicNode> * printer = new BTNode<BasicNode>(head);
 	printer->printTree();
 }
