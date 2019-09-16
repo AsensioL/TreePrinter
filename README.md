@@ -7,16 +7,18 @@ After searching a little bit on the Internet and not finding anything that would
 I hope there isn't any flagrant errors on my code (I am Aerospace major, not CS, altough I took some CS classes).
 
 ## Idea
-My idea was to create a superclass that would embrace the head node of a tree (one in which nodes can have an arbitrary number of children), and would have the capacity to print the whole tree on the console.
+To create a superclass that embraces the head node of a tree (where nodes can have an arbitrary number of children).
 
-I ended up using a template (derived from the original class) to improve extendability, and let other people use it as a black box (without having to open and modify anything).
+By doing so, it enables to print the whole tree on the console without messing the original node class.
+
+It uses a templated class and a set-up function to avoid the hustle of diving into the internals.
 
 ## How to use it
 ### Step 1
-Copy the BTNode Class (from the `src` folder) into your project (I hope there are no conflicts).
+Copy the BTNode Class, from the `src` folder to your project folder.
 
 ### Step 2
-You will need two things (you most likely have something similar to them if you are building this kind of tree):
+Your node class needs 2 things. You most likely have them already, or it's trivial to add them if you are building this kind of tree.
 1. A getChildren member function of your node class that
     1. takes no parameters, and
     2. returns a constant reference to a standard list of pointer to its children (aka `const std::list<YourClass *> & YourClass::getChildrenFunction()`)
@@ -27,11 +29,11 @@ You will need two things (you most likely have something similar to them if you 
 ### Step 3
 Set up the templated class in *your code* before using it:
 ```cpp
-BTNode<YourClass>::initializeClass(YourClass::getChildrenFunction, YourClass::getStringFunction);
+BTNode<YourClass>::initializeClass(&YourClass::getChildrenFunction, &YourClass::getStringFunction);
 ```
 
 ### Step 4
-Initialize the BTNode with a pointer to your class, and ask it to print the tree:
+Initialize the BTNode with a pointer to the main node, and ask it to print the tree:
 ```cpp
 BTNode<YourClass> printer(headNodeOfYourTree);
 printer.printTree();
@@ -49,11 +51,23 @@ a b c  ^  d
       / \  
       e f 
 ```
-Example 2 (I know there is a bug in spacing, I will fix it on the future)
+Example 2
 ```text
-      _______________me_______________      
-     /           /      \    \        \     
-   _Paul_       Anna  Sarah Emma    _Tina   
-  /      \       |                 /     \  
+      _______________me_______________
+     /           /      \    \        \
+   _Paul_       Anna  Sarah Emma    _Tina
+  /      \       |                 /     \
 Kevin Elloine Anthony            Susan Jason
+```
+Example 3
+```text
+                     _________________________________me_________________________________
+                    /                                   \          \        \            \
+   ________________Paul_______________               Anthony     Sarah     Emma        _Tina
+  /      /                            \                 |                   |         /     \
+Kevin Antoine                 _____Elloine_____     Mary Jane             _Eva__    Susan Jason
+                             /                 \    /       \            /      \
+                  _________Hector_________    Tom Edison Chaplin       Oliver Harry
+                 /       /        \       \
+              Charlie Jennifer Margaret Megan
 ```
