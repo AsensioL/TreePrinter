@@ -13,10 +13,10 @@
 int main() {
 	BasicNode * head     = new BasicNode("me");
 	BasicNode * childL   = new BasicNode("Paul");
-	BasicNode * childCL  = new BasicNode("Anthony");
+	BasicNode * childCL  = new BasicNode("Mary Jane");
 	BasicNode * childCC  = new BasicNode("Sarah");
 	BasicNode * childCR  = new BasicNode("Emma");
-	BasicNode * childR   = new BasicNode("Tina");
+	BasicNode * childR   = new BasicNode("Bartholomew III");
 
 	BasicNode * childLL  = new BasicNode("Kevin");
 	BasicNode * childLC  = new BasicNode("Antoine");
@@ -30,7 +30,7 @@ int main() {
 	BasicNode * childLRLCR  = new BasicNode("Margaret");
 	BasicNode * childLRLR   = new BasicNode("Megan");
 
-	BasicNode * childCLC = new BasicNode("Mary Jane");
+	BasicNode * childCLC = new BasicNode("Anthony");
 
 	BasicNode * childCLCL = new BasicNode("Edison");
 	BasicNode * childCLCR = new BasicNode("Chaplin");

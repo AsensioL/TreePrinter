@@ -61,13 +61,13 @@ Kevin Elloine Anthony            Susan Jason
 ```
 Example 3
 ```text
-                     _________________________________me_________________________________
-                    /                                   \          \        \            \
-   ________________Paul_______________               Anthony     Sarah     Emma        _Tina
-  /      /                            \                 |                   |         /     \
-Kevin Antoine                 _____Elloine_____     Mary Jane             _Eva__    Susan Jason
-                             /                 \    /       \            /      \
-                  _________Hector_________    Tom Edison Chaplin       Oliver Harry
-                 /       /        \       \
-              Charlie Jennifer Margaret Megan
+                     __________________________________me__________________________________        
+                    /                                   \          \        \              \       
+   ________________Paul_______________              Mary Jane    Sarah     Emma     Bartholomew III
+  /      /                            \                 |                   |           /     \    
+Kevin Antoine                 _____Elloine_____      Anthony              _Eva__      Susan Jason  
+                             /                 \    /       \            /      \                  
+                  _________Hector_________    Tom Edison Chaplin       Oliver Harry                
+                 /       /        \       \                                                        
+              Charlie Jennifer Margaret Megan                                                      
 ```

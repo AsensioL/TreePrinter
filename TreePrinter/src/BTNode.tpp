@@ -33,13 +33,8 @@ const std::list<T *> & BTNode<T>::getChildren() {
 }
 
 template <class T>
-const std::string BTNode<T>::getData() {
-	std::string str;
-	if (!_fake)
-		str = CALL_MEMBER_FN(*_nd,dataGetter)();
-	else
-		str = std::string(_wself, ' ');
-	return str;
+const std::string & BTNode<T>::getData() {
+	return CALL_MEMBER_FN(*_nd,dataGetter)();
 }
 
 
@@ -48,36 +43,12 @@ const std::string BTNode<T>::getData() {
  */ /*************************************************/
 
 /**
- * Fake / Filler Node Constructor
- */
-template <class T>
-BTNode<T>::BTNode(lluint len, lluint depth, lluint height) {
-	_nd = nullptr;
-	_depth = depth;
-	_height = height;
-
-	_fcp = 0;
-	_lcp = 0;
-	_mcp = 0;
-
-	_fbp = 0;
-	_lbp = 0;
-
-	_wself  = len;
-	_wchild = 0;
-	_wblock = 0;
-
-	_fake = true;
-}
-
-/**
  * Node Constructor
  */
 template <class T>
 BTNode<T>::BTNode(T* node) {
 	_nd = node;
 	_depth = 0;
-	_height = 0;
 
 	_fcp = 0;
 	_lcp = 0;
@@ -90,15 +61,12 @@ BTNode<T>::BTNode(T* node) {
 	_wchild = 0;
 	_wblock = 0;
 
-	_fake = false;
-
 	// Create new list of nodes, imitating the structure of the passed node
 	const std::list<T *> & ls = getChildren();
 	for (auto * child: ls)
 	{
 		_children.push_back(new BTNode(child));
 	}
-
 }
 
 /**
@@ -106,7 +74,51 @@ BTNode<T>::BTNode(T* node) {
  */
 template <class T>
 BTNode<T>::~BTNode() {
+	
 }
+
+/**
+ * Main Algorightm Function. Read comments for detail.
+ */
+template <class T>
+void BTNode<T>::printTree() {
+	// --- Preparation for the algorithm ---
+	
+	// Characterize main node and subnodes
+	calcDepth(0); // NOTE: depth is how far down the top of the tree the node is (head is 0, its children are 1, etc)
+	calcWidth();
+	
+	// Create a vector with the layers of the tree (layer 0 has the head, layer 1 has its children, ...)
+	std::vector<std::list<BTNode *> *> levels;
+	groupNodesByDepth(levels, this);
+	
+	// Load the position information into the node (here's where the Magic bakes)
+	assignPositionsToNodes(0);
+	
+	// --- Printing algorithm ---
+	
+	// Print line of nodes (head and some '_')
+	printLine(0, levels);
+	
+	// Iteratively print an intermediate line (only '/', '\' and '|') followed by the next line of nodes
+	for (lluint i = 1; i < levels.size(); i++)
+	{
+		printPreline(i, levels);
+		printLine(i, levels);
+	}
+	
+	// --- Clean up ---
+	
+	// Remove layers from the vector
+	for (auto ptr : levels)
+	{
+		delete ptr;
+	}
+}
+
+/** **************************************************
+ * ***** Helper Functions for the Main Algorithm *****
+ */ /*************************************************/
 
 /**
  * Calculate Depth of Nodes (recursive). Assign the depth initialDepth to the node and
@@ -124,50 +136,7 @@ void BTNode<T>::calcDepth(lluint initialDepth)
 }
 
 /**
- * Calculate Height of Node (Recursive). Tells each node the maximum amount of layers of children
- * below itself. (Eventually we only care about the head node).
- */
-template <class T>
-lluint BTNode<T>::calcHeight()
-{
-	_height = 0;
-	for (auto child : _children)
-	{
-		_height = std::max(_height, child->calcHeight());
-	}
-	return _height + 1;
-}
-
-/**
- * Add 1 children to nodes without children until all branches reach the bottom of the tree.
- * Eventually this helps calculating spaces for the lowest row.
- */
-template <class T>
-void BTNode<T>::fakeFullTree(lluint desiredDepth)
-{
-	if (_depth == desiredDepth)
-	{
-		return;
-	}
-	else // (_depth <= desiredDepth)
-	{
-		if (_children.empty())
-		{
-			_children.push_back(new BTNode(_wself, _depth+1, _height-1));
-			_children.back()->fakeFullTree(desiredDepth);
-		}
-		else
-		{
-			for (BTNode * nd : _children)
-			{
-				nd->fakeFullTree(desiredDepth);
-			}
-		}
-	}
-}
-
-/**
- * Calculates the max width of the node and its children. It takes into account wether the combination
+ * Calculates the max width of the node and its children (Recursive). It takes into account wether the combination
  * of children is bigger or smaller than the parent
  */
 template <class T>
@@ -193,58 +162,9 @@ lluint BTNode<T>::calcWidth()
 }
 
 /**
- * Main Algorightm Function. Read comments for detail.
- */
-template <class T>
-void BTNode<T>::printTree() {
-	// --- Preparation for the algorithm ---
-	
-	// Characterize main node
-	calcDepth(0);
-	calcHeight(); // NOTE: the height of a node is how many nodes down is the farthest node
-	fakeFullTree(_height);
-	calcWidth();
-	
-	// Create a vector with the layers of the tree (layer 0 has the head, layer 1 has its children, ...)
-	std::vector<std::list<BTNode *> *> levels;
-	for (lluint i = 0; i <= _height; i++)
-	{
-		levels.push_back(new std::list<BTNode *>());
-	}
-	groupNodesByDepth(levels, this);
-	
-	// Load the information of where each node goes into the nodes
-	assignPositionsToNodes(0);
-	
-	// --- Printing algorithm ---
-	
-	// Print line of nodes (head and some '_')
-	printLine(0, levels);
-	
-	// Iteratively print an intermediate line (only '/', '\' and '|') followed by the next line of nodes
-	for (lluint i = 1; i <= _height; i++)
-	{
-		printPreline(i, levels);
-		printLine(i, levels);
-	}
-	
-	// --- Clean up ---
-	
-	// Remove layers from the vector
-	for (auto ptr : levels)
-	{
-		delete ptr;
-	}
-}
-
-
-
-/** **************************************************
- * ***** Helper Functions for the Main Algorithm *****
- */ /*************************************************/
-
-/**
- * 
+ * Groups nodes into a vector of layers. First layer is the thead
+ * next layer are the head's direct children, etc.
+ * It helps iterating through nodes at the same depth
  */
 template <class T>
 void BTNode<T>::groupNodesByDepth(std::vector<std::list<BTNode *> *> & levels, BTNode * head) {
@@ -261,11 +181,19 @@ void BTNode<T>::groupNodesByDepth(std::vector<std::list<BTNode *> *> & levels, B
 		{
 			queue.push_back(child);
 		}
-		// Group by depth
+		// Add layers to the levels if it is not deep enough
+		while (levels.size() <= nd->_depth)
+		{
+			levels.push_back(new std::list<BTNode *>());
+		}
 		levels[nd->_depth]->push_back(nd);
 	}
 }
 
+/**
+ * It calculates future position to the nodes, to help place them
+ * in one pass (Recursive)(Algorithm).
+ */
 template <class T>
 lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
 {
@@ -273,9 +201,9 @@ lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
 	_fbp = blockStart;
 	_lbp = blockStart + _wblock - 1;
 	
-	if (_wself >= _wchild)
+	if (_wself >= _wchild) // if this node is longer than the children
 	{
-		// Do self first
+		// Do this node first
 		_fcp = blockStart + (_wblock - _wself) / 2;
 		_lcp = _fcp + _wself -1;
 		_mcp = (_fcp + _lcp) / 2; // left aligning;
@@ -287,7 +215,7 @@ lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
 			childrenBlockStart = nd->assignPositionsToNodes(childrenBlockStart);
 		}
 	}
-	else
+	else // if the combination of children is longer than this node
 	{
 		// Do the children first
 		lluint childrenBlockStart = blockStart + (_wblock - _wchild) / 2;
@@ -296,16 +224,19 @@ lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
 			childrenBlockStart = nd->assignPositionsToNodes(childrenBlockStart);
 		}
 
-		// Then, do self
+		// Then, do this node
 		_mcp = (_children.front()->_mcp + _children.back()->_mcp) / 2;
 		_fcp = _mcp - (_wself - 1)  / 2; // left aligning;
 		_lcp = _fcp + _wself -1;
 	}
 	
-	// Return start of the next block
+	// Return first character of the next block
 	return blockStart + _wblock + 1;
 }
 
+/**
+ * Print line of nodes. This also prints underscores to draw the branches
+ */
 template <class T>
 void BTNode<T>::printLine(lluint ln, std::vector<std::list<BTNode *> *> & levels) {
 	for (lluint c = 0; c < _wblock; c++)
@@ -314,7 +245,7 @@ void BTNode<T>::printLine(lluint ln, std::vector<std::list<BTNode *> *> & levels
 		{
 			c += printNodeStartingAt(c, levels[ln]) -1;
 		}
-		else if (((ln+1) < (levels.size())) && CisBetweenChildrenAndParent(c, levels[ln]))
+		else if (CisBetweenChildrenAndParent(c, levels[ln]))
 		{
 			printUnderscore();
 		}
@@ -323,53 +254,12 @@ void BTNode<T>::printLine(lluint ln, std::vector<std::list<BTNode *> *> & levels
 			printSpace();
 		}
 	}
-
 	std::cout << std::endl;
 }
 
-template <class T>
-bool BTNode<T>::CisParentFirstCharacter(lluint c, std::list<BTNode *> * level)
-{
-	for (BTNode * & nd : *level)
-	{
-		if (nd->_fcp == c)
-			return true;
-	}
-	return false;
-}
-
-template <class T>
-lluint BTNode<T>::printNodeStartingAt(lluint c, std::list<BTNode *> * level)
-{
-	// Find corresponding node
-	for (BTNode * & nd : * level)
-	{
-		if (nd->_fcp == c)
-		{
-			// Return the number of characters printed
-			return nd->printNodeData();
-		}
-	}
-	return 0; // TODO: this should be an error
-}
-
-template <class T>
-bool BTNode<T>::CisBetweenChildrenAndParent(lluint c, std::list<BTNode *> * parent)
-{
-	for (BTNode * & nd : *parent)
-	{
-		if (nd->_children.empty())
-		{
-			continue;
-		}
-		lluint minCp = nd->_children.front()->_mcp;
-		lluint maxCp = nd->_children.back( )->_mcp;
-		if (c > minCp && c < maxCp)
-			return true;
-	}
-	return false;
-}
-
+/**
+ * Prints in the space between lines. This prints 3 simbols '/', '\', '|' and spaces.
+ */
 template <class T>
 void BTNode<T>::printPreline(lluint ln, std::vector<std::list<BTNode *> *> & levels) {
 	for (lluint c = 0; c < _wblock; c++)
@@ -397,17 +287,80 @@ void BTNode<T>::printPreline(lluint ln, std::vector<std::list<BTNode *> *> & lev
 	std::cout << std::endl;
 }
 
+/**
+ * Return true if this is the first character of a node
+ * TODO: add in-out (by ref) parameter to function for the parent node (to avoid iteration if true)
+ */
 template <class T>
-bool BTNode<T>::CisCenterChildren(lluint c, std::list<BTNode *> * children)
+bool BTNode<T>::CisParentFirstCharacter(lluint c, std::list<BTNode *> * level)
 {
-	for (BTNode * & nd : * children)
+	for (BTNode * & nd : *level)
 	{
-		if (nd->_mcp == c && !nd->_fake)
+		if (nd->_fcp == c)
 			return true;
 	}
 	return false;
 }
 
+/**
+ * Print the node starting at c in the layer passed and return the number of characters written.
+ */
+template <class T>
+lluint BTNode<T>::printNodeStartingAt(lluint c, std::list<BTNode *> * level)
+{
+	// Find corresponding node
+	for (BTNode * & nd : * level)
+	{
+		if (nd->_fcp == c)
+		{
+			// Return the number of characters printed
+			return nd->printNodeData();
+		}
+	}
+	return 0; // TODO: this should be an error
+}
+
+/**
+ * Check if the character in position c is between a parent node and his childs center character.
+ * If so, an underscore mus be printed
+ */
+template <class T>
+bool BTNode<T>::CisBetweenChildrenAndParent(lluint c, std::list<BTNode *> * parent)
+{
+	for (BTNode * & nd : *parent)
+	{
+		if (nd->_children.empty())
+		{
+			continue;
+		}
+		lluint minCp = nd->_children.front()->_mcp;
+		lluint maxCp = nd->_children.back( )->_mcp;
+		if (c > minCp && c < maxCp)
+			return true;
+	}
+	return false;
+}
+
+/**
+ * Check if the character in position c is on top of a childen's center character.
+ * If so, a vertical or diagonal bar (/\|) must be printed
+ * TODO: add in-out (by ref) children
+ */
+template <class T>
+bool BTNode<T>::CisCenterChildren(lluint c, std::list<BTNode *> * children)
+{
+	for (BTNode * & nd : * children)
+	{
+		if (nd->_mcp == c)
+			return true;
+	}
+	return false;
+}
+
+/**
+ * Determine if the character in position c joins the children underneath to its parent by means
+ * of a vertical bar '|', a slash '/', or a backslash '\'. 
+ */
 template <class T>
 int BTNode<T>::parentPositionRelToChildren(lluint c, std::list<BTNode *> * parent, std::list<BTNode *> * children)
 {
@@ -436,12 +389,18 @@ int BTNode<T>::parentPositionRelToChildren(lluint c, std::list<BTNode *> * paren
 		return 1;
 }
 
-
+/**
+ * Print the node data through the imported function and return its length
+ */
 template <class T>
 lluint BTNode<T>::printNodeData() {
 	std::cout << getData();
 	return _wself; // Return the number of characters printed
 }
+
+/*
+ * Print functions
+ */
 
 template <class T>
 void BTNode<T>::printSpace() {
