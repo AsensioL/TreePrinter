@@ -5,6 +5,7 @@
  *      Author: asens
  *
  *  Known bugs:
+ *    * If the parent node is longer than the combination of the children, it will crash
  *
  *  Minor problems:
  *    * Placement of '/' feels skewed to the left on words with even characters to the left of its parent
@@ -30,14 +31,13 @@ class BTNode {
 	static dataGetterFcn	 dataGetter;
 
 	const std::list<T *> & getChildren();
-	const std::string      getData();
+	const std::string    & getData();
 
 
 	/**
 	 * Printer class
 	 */
 public:
-	BTNode(lluint len, lluint depth, lluint height); // fake are nodes necessary to make trees full
 	BTNode(T* node);
 
 	virtual ~BTNode();
@@ -45,15 +45,10 @@ public:
 	void printTree();
 
 private:
-	void calcDepth(lluint initialDepth);
-	lluint calcHeight();
-	void fakeFullTree(lluint desiredDepth);
-	lluint calcWidth();
 
 	T * _nd;
 	std::list<BTNode *> _children;
 	lluint _depth;
-	lluint _height;
 
 	lluint _wself;
 	lluint _wchild;
@@ -65,7 +60,8 @@ private:
 	lluint _fbp; // First  Block     Position
 	lluint _lbp; // Last   Block     Position
 
-	bool _fake;
+	void calcDepth(lluint initialDepth);
+	lluint calcWidth();
 
 	void groupNodesByDepth(     std::vector<std::list<BTNode *> *> & levels, BTNode * head);
 	lluint assignPositionsToNodes(lluint blockStart);
