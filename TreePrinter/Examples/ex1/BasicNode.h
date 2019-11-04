@@ -19,9 +19,9 @@ public:
 	virtual ~BasicNode();
 
 	void addChildren(BasicNode * nd);
-	const std::list<BasicNode *> & getChildren();
+	const std::list<BasicNode *> getChildren();
 
-	const std::string & getData();
+	const std::string getData();
 	void setData(std::string data);
 
 protected:

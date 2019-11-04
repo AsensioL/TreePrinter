@@ -22,16 +22,22 @@ typedef long long unsigned int lluint;
 
 template <class T>
 class BTNode {
+
+
+	/**
+	 * Static Adaptor
+	 */
   public:
-	typedef const std::list<T*> & (T::*childrenGetterFcn)( void);
-	typedef const std::string   & (T::*dataGetterFcn)    ( void);
+	  // Create typdefs for the the getter functions for the Adaptor
+	typedef const std::list<T*> (T::*childrenGetterFcn)( void);
+	typedef const std::string   (T::*dataGetterFcn)    ( void);
 	static void initializeClass(childrenGetterFcn f1, dataGetterFcn f2);
   private:
 	static childrenGetterFcn childrenGetter;
 	static dataGetterFcn	 dataGetter;
 
-	const std::list<T *> & getChildren();
-	const std::string    & getData();
+	const std::list<T *> getChildren();
+	const std::string    getData();
 
 
 	/**
