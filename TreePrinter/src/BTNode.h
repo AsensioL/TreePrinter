@@ -17,6 +17,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <memory>
 
 template <class T>
 class BTNode {
@@ -67,19 +68,19 @@ private:
 	void calcDepth(std::size_t initialDepth);
 	std::size_t calcWidth();
 
-	void groupNodesByDepth(     std::vector<std::list<BTNode *> *> & levels, BTNode * head);
+	void groupNodesByDepth(std::vector<std::unique_ptr<std::list<BTNode *>>> & levels, BTNode * head);
 	std::size_t assignPositionsToNodes(std::size_t blockStart);
 	
-	void printLine(std::size_t ln,    std::vector<std::list<BTNode *> *> & levels);
-	void printPreline(std::size_t ln, std::vector<std::list<BTNode *> *> & levels);
+	void printLine(std::size_t ln,    std::vector<std::unique_ptr<std::list<BTNode *>>> & levels);
+	void printPreline(std::size_t ln, std::vector<std::unique_ptr<std::list<BTNode *>>> & levels);
 	
-	std::size_t printNodeStartingAt(std::size_t c, std::list<BTNode *> * level);
+	std::size_t printNodeStartingAt(std::size_t c, std::unique_ptr<std::list<BTNode *>> & level);
 	std::size_t printNodeData();
 	
-	bool CisParentFirstCharacter(std::size_t c, std::list<BTNode *> * level);
-	bool CisBetweenChildrenAndParent(std::size_t c, std::list<BTNode *> * parent);
-	bool CisCenterChildren(std::size_t c, std::list<BTNode *> * children);
-	int parentPositionRelToChildren(std::size_t c, std::list<BTNode *> * parent, std::list<BTNode *> * children);
+	bool CisParentFirstCharacter(std::size_t c, std::unique_ptr<std::list<BTNode *>> & level);
+	bool CisBetweenChildrenAndParent(std::size_t c, std::unique_ptr<std::list<BTNode *>> & parent);
+	bool CisCenterChildren(std::size_t c, std::unique_ptr<std::list<BTNode *>> & children);
+	int parentPositionRelToChildren(std::size_t c, std::unique_ptr<std::list<BTNode *>> & parent, std::unique_ptr<std::list<BTNode *>> & children);
 	
 	
 	void printSpace();
