@@ -21,10 +21,10 @@ Copy the BTNode Class, from the `src` folder to your project folder.
 Your node class needs 2 things. You most likely have them already, or it's trivial to add them if you are building this kind of tree.
 1. A getChildren member function of your node class that
     1. takes no parameters, and
-    2. returns a constant reference to a standard list of pointer to its children (aka `const std::list<YourClass *> & YourClass::getChildrenFunction()`)
+    2. returns a standard list of pointer to its children (aka `std::list<YourClass *> YourClass::getChildrenFunction()`)
 2. A getData member function of your node class that
     1. takes no parameters, and
-    2. returns a constant reference to a standard string of its content (aka `const std::string & YourClass::getStringFunction()`)
+    2. returns a standard string of its content (aka `std::string YourClass::getStringFunction()`)
 
 ### Step 3
 Set up the templated class in *your code* before using it:

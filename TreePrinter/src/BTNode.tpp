@@ -28,12 +28,12 @@ void BTNode<T>::initializeClass(childrenGetterFcn f1, dataGetterFcn f2)
 }
 
 template <class T>
-const std::list<T *> BTNode<T>::getChildren() {
+std::list<T *> BTNode<T>::getChildren() {
 	return CALL_MEMBER_FN(*_nd,childrenGetter)();
 }
 
 template <class T>
-const std::string BTNode<T>::getData() {
+std::string BTNode<T>::getData() {
 	return CALL_MEMBER_FN(*_nd,dataGetter)();
 }
 

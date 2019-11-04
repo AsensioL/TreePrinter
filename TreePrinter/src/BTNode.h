@@ -28,15 +28,15 @@ class BTNode {
 	 */
   public:
 	  // Create typdefs for the the getter functions for the Adaptor
-	typedef const std::list<T*> (T::*childrenGetterFcn)( void);
-	typedef const std::string   (T::*dataGetterFcn)    ( void);
+	typedef std::list<T*> (T::*childrenGetterFcn)( void);
+	typedef std::string   (T::*dataGetterFcn)    ( void);
 	static void initializeClass(childrenGetterFcn f1, dataGetterFcn f2);
   private:
 	static childrenGetterFcn childrenGetter;
 	static dataGetterFcn	 dataGetter;
 
-	const std::list<T *> getChildren();
-	const std::string    getData();
+	std::list<T *> getChildren();
+	std::string    getData();
 
 
 	/**
