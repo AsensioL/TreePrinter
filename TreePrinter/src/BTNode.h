@@ -18,8 +18,6 @@
 #include <list>
 #include <vector>
 
-typedef long long unsigned int lluint;
-
 template <class T>
 class BTNode {
 
@@ -54,34 +52,34 @@ private:
 
 	T * _nd;
 	std::list<BTNode *> _children;
-	lluint _depth;
+	std::size_t _depth;
 
-	lluint _wself;
-	lluint _wchild;
-	lluint _wblock;
+	std::size_t _wself;
+	std::size_t _wchild;
+	std::size_t _wblock;
 
-	lluint _fcp; // First  Character Position
-	lluint _lcp; // Last   Character Position
-	lluint _mcp; // Middle Character Position
-	lluint _fbp; // First  Block     Position
-	lluint _lbp; // Last   Block     Position
+	std::size_t _fcp; // First  Character Position
+	std::size_t _lcp; // Last   Character Position
+	std::size_t _mcp; // Middle Character Position
+	std::size_t _fbp; // First  Block     Position
+	std::size_t _lbp; // Last   Block     Position
 
-	void calcDepth(lluint initialDepth);
-	lluint calcWidth();
+	void calcDepth(std::size_t initialDepth);
+	std::size_t calcWidth();
 
 	void groupNodesByDepth(     std::vector<std::list<BTNode *> *> & levels, BTNode * head);
-	lluint assignPositionsToNodes(lluint blockStart);
+	std::size_t assignPositionsToNodes(std::size_t blockStart);
 	
-	void printLine(lluint ln,    std::vector<std::list<BTNode *> *> & levels);
-	void printPreline(lluint ln, std::vector<std::list<BTNode *> *> & levels);
+	void printLine(std::size_t ln,    std::vector<std::list<BTNode *> *> & levels);
+	void printPreline(std::size_t ln, std::vector<std::list<BTNode *> *> & levels);
 	
-	lluint printNodeStartingAt(lluint c, std::list<BTNode *> * level);
-	lluint printNodeData();
+	std::size_t printNodeStartingAt(std::size_t c, std::list<BTNode *> * level);
+	std::size_t printNodeData();
 	
-	bool CisParentFirstCharacter(lluint c, std::list<BTNode *> * level);
-	bool CisBetweenChildrenAndParent(lluint c, std::list<BTNode *> * parent);
-	bool CisCenterChildren(lluint c, std::list<BTNode *> * children);
-	int parentPositionRelToChildren(lluint c, std::list<BTNode *> * parent, std::list<BTNode *> * children);
+	bool CisParentFirstCharacter(std::size_t c, std::list<BTNode *> * level);
+	bool CisBetweenChildrenAndParent(std::size_t c, std::list<BTNode *> * parent);
+	bool CisCenterChildren(std::size_t c, std::list<BTNode *> * children);
+	int parentPositionRelToChildren(std::size_t c, std::list<BTNode *> * parent, std::list<BTNode *> * children);
 	
 	
 	void printSpace();
