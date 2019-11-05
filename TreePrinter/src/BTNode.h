@@ -19,18 +19,19 @@
 #include <vector>
 #include <memory>
 
+// Node class
 template <class T>
-class BTNode {
-
-
-	/**
-	 * Static Adaptor
-	 */
+class BTNode
+{
+  /**
+   * Static Adaptor
+   */
   public:
-	  // Create typdefs for the the getter functions for the Adaptor
+	// Typedefs for the getter functions
 	typedef std::list<T*> (T::*childrenGetterFcn)( void);
 	typedef std::string   (T::*dataGetterFcn)    ( void);
 	static void initializeClass(childrenGetterFcn f1, dataGetterFcn f2);
+
   private:
 	static childrenGetterFcn childrenGetter;
 	static dataGetterFcn	 dataGetter;
@@ -38,21 +39,19 @@ class BTNode {
 	std::list<T *> getChildren();
 	std::string    getData();
 
-
-	/**
-	 * Printer class
-	 */
-public:
+  /**
+   * Printer class
+   */
+  public:
 	BTNode(T* node);
 
 	virtual ~BTNode();
 
-	void printTree();
+	void printTree(std::shared_ptr<BTNode<T>> thisHead);
 
-private:
-
+  private:
 	T * _nd;
-	std::list<BTNode *> _children;
+	std::list<std::shared_ptr<BTNode>> _children;
 	std::size_t _depth;
 
 	std::size_t _wself;
@@ -68,19 +67,19 @@ private:
 	void calcDepth(std::size_t initialDepth);
 	std::size_t calcWidth();
 
-	void groupNodesByDepth(std::vector<std::unique_ptr<std::list<BTNode *>>> & levels, BTNode * head);
+	void groupNodesByDepth(std::vector<std::unique_ptr<std::list<std::shared_ptr<BTNode>>>> & levels, std::shared_ptr<BTNode<T>> thisHead);
 	std::size_t assignPositionsToNodes(std::size_t blockStart);
 	
-	void printLine(std::size_t ln,    std::vector<std::unique_ptr<std::list<BTNode *>>> & levels);
-	void printPreline(std::size_t ln, std::vector<std::unique_ptr<std::list<BTNode *>>> & levels);
+	void printLine(std::size_t ln,    std::vector<std::unique_ptr<std::list<std::shared_ptr<BTNode>>>> & levels);
+	void printPreline(std::size_t ln, std::vector<std::unique_ptr<std::list<std::shared_ptr<BTNode>>>> & levels);
 	
-	std::size_t printNodeStartingAt(std::size_t c, std::unique_ptr<std::list<BTNode *>> & level);
+	std::size_t printNodeStartingAt(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & level);
 	std::size_t printNodeData();
 	
-	bool CisParentFirstCharacter(std::size_t c, std::unique_ptr<std::list<BTNode *>> & level);
-	bool CisBetweenChildrenAndParent(std::size_t c, std::unique_ptr<std::list<BTNode *>> & parent);
-	bool CisCenterChildren(std::size_t c, std::unique_ptr<std::list<BTNode *>> & children);
-	int parentPositionRelToChildren(std::size_t c, std::unique_ptr<std::list<BTNode *>> & parent, std::unique_ptr<std::list<BTNode *>> & children);
+	bool CisParentFirstCharacter(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & level);
+	bool CisBetweenChildrenAndParent(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & parent);
+	bool CisCenterChildren(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & children);
+	int parentPositionRelToChildren(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & parent, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & children);
 	
 	
 	void printSpace();
@@ -89,6 +88,22 @@ private:
 	void printRightChildren();
 	void printVerticalChildren();
 
+};
+
+// Tree Class
+template <class T>
+class BTTree
+{
+  public:
+	// Typedefs for the getter functions
+	typedef std::list<T*> (T::*childrenGetterFcn)( void);
+	typedef std::string   (T::*dataGetterFcn)    ( void);
+	// Constructor
+	BTTree(T* head, childrenGetterFcn f1, dataGetterFcn f2);
+	void print();
+
+  private:
+	std::shared_ptr<BTNode<T>> _head;
 };
 
 #include "BTNode.tpp"

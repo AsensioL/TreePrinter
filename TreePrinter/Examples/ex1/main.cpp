@@ -38,8 +38,9 @@ int main() {
 	childRC->addChildren(childRCL);
 	childRC->addChildren(childRCC);
 
-	BTNode<BasicNode>::initializeClass(&BasicNode::getChildren, &BasicNode::getData);
-	BTNode<BasicNode> * printer = new BTNode<BasicNode>(head);
-	printer->printTree();
+	BTTree<BasicNode> printer(head, &BasicNode::getChildren, &BasicNode::getData);
+	printer.print();
+
+	delete head; // This deletes all subnodes
 }
 
