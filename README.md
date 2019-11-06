@@ -30,7 +30,6 @@ Your node class needs 3 things. You most likely have them already, or it is triv
 ### Step 3
 Initialize the templated class in *your code* with a pointer to the main node of your tree, and the two functions above:
 ```cpp
-	BTTree<BasicNode> printer(head, &BasicNode::getChildren, &BasicNode::getData);
 BTTree<YourClass> printer(ptrToHeadNodeOfYourTree, &YourClass::youGetChildrenFunction, &YourClass::yourGetStringFunction);
 ```
 
