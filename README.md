@@ -4,7 +4,7 @@ C++ Console Printer for Trees with Any Number of Children
 ## History
 After searching a little bit on the Internet and not finding anything that would do the job I decided to do it my self (and later decided to share it with the community).
 
-I hope there isn't any flagrant errors on my code (I am Aerospace major, not CS, altough I took some CS classes).
+I hope there is not any flagrant errors on my code (I am Aerospace major, not CS, altough I took some CS classes).
 
 ## Idea
 To create a superclass that embraces the head node of a tree (where nodes can have an arbitrary number of children).
@@ -18,25 +18,26 @@ It uses a templated class and a set-up function to avoid the hustle of diving in
 Copy the BTNode Class, from the `src` folder to your project folder.
 
 ### Step 2
-Your node class needs 2 things. You most likely have them already, or it's trivial to add them if you are building this kind of tree.
-1. A getChildren member function of your node class that
+Your node class needs 3 things. You most likely have them already, or it is trivial to add them if you are building this kind of tree.
+1. A pointer to the main node of your tree (aka `YourClass * ptrToHeadNodeOfYourTree`)
+2. A _getChildren_ member function of your node class that
     1. takes no parameters, and
-    2. returns a constant reference to a standard list of pointer to its children (aka `const std::list<YourClass *> & YourClass::getChildrenFunction()`)
-2. A getData member function of your node class that
+    2. returns a standard list of pointer to its children (aka `std::list<YourClass *> YourClass::youGetChildrenFunction()`)
+3. A _getData_ member function of your node class that
     1. takes no parameters, and
-    2. returns a constant reference to a standard string of its content (aka `const std::string & YourClass::getStringFunction()`)
+    2. returns a standard string of its content (aka `std::string YourClass::yourGetStringFunction()`)
 
 ### Step 3
-Set up the templated class in *your code* before using it:
+Initialize the templated class in *your code* with a pointer to the main node of your tree, and the two functions above:
 ```cpp
-BTNode<YourClass>::initializeClass(&YourClass::getChildrenFunction, &YourClass::getStringFunction);
+	BTTree<BasicNode> printer(head, &BasicNode::getChildren, &BasicNode::getData);
+BTTree<YourClass> printer(ptrToHeadNodeOfYourTree, &YourClass::youGetChildrenFunction, &YourClass::yourGetStringFunction);
 ```
 
 ### Step 4
-Initialize the BTNode with a pointer to the main node, and ask it to print the tree:
+Print the tree:
 ```cpp
-BTNode<YourClass> printer(headNodeOfYourTree);
-printer.printTree();
+printer.print();
 ```
 
 ## Results

@@ -28,12 +28,12 @@ void BTNode<T>::initializeClass(childrenGetterFcn f1, dataGetterFcn f2)
 }
 
 template <class T>
-const std::list<T *> & BTNode<T>::getChildren() {
+std::list<T *> BTNode<T>::getChildren() {
 	return CALL_MEMBER_FN(*_nd,childrenGetter)();
 }
 
 template <class T>
-const std::string & BTNode<T>::getData() {
+std::string BTNode<T>::getData() {
 	return CALL_MEMBER_FN(*_nd,dataGetter)();
 }
 
@@ -62,10 +62,13 @@ BTNode<T>::BTNode(T* node) {
 	_wblock = 0;
 
 	// Create new list of nodes, imitating the structure of the passed node
-	const std::list<T *> & ls = getChildren();
-	for (auto * child: ls)
+	std::list<T *> ls = getChildren();
+	for (auto & child: ls)
 	{
-		_children.push_back(new BTNode(child));
+		// Create unique pointer to a child
+		std::shared_ptr<BTNode> newChild(new BTNode(child));
+		// Move the unique pointer to the list (C++11 compatible)
+		_children.push_back(std::move(newChild));
 	}
 }
 
@@ -81,7 +84,7 @@ BTNode<T>::~BTNode() {
  * Main Algorightm Function. Read comments for detail.
  */
 template <class T>
-void BTNode<T>::printTree() {
+void BTNode<T>::printTree(std::shared_ptr<BTNode<T>> thisHead) {
 	// --- Preparation for the algorithm ---
 	
 	// Characterize main node and subnodes
@@ -89,8 +92,8 @@ void BTNode<T>::printTree() {
 	calcWidth();
 	
 	// Create a vector with the layers of the tree (layer 0 has the head, layer 1 has its children, ...)
-	std::vector<std::list<BTNode *> *> levels;
-	groupNodesByDepth(levels, this);
+	std::vector<std::unique_ptr<std::list<std::shared_ptr<BTNode>>>> levels;
+	groupNodesByDepth(levels, thisHead);
 	
 	// Load the position information into the node (here's where the Magic bakes)
 	assignPositionsToNodes(0);
@@ -101,18 +104,10 @@ void BTNode<T>::printTree() {
 	printLine(0, levels);
 	
 	// Iteratively print an intermediate line (only '/', '\' and '|') followed by the next line of nodes
-	for (lluint i = 1; i < levels.size(); i++)
+	for (std::size_t i = 1; i < levels.size(); i++)
 	{
 		printPreline(i, levels);
 		printLine(i, levels);
-	}
-	
-	// --- Clean up ---
-	
-	// Remove layers from the vector
-	for (auto ptr : levels)
-	{
-		delete ptr;
 	}
 }
 
@@ -126,10 +121,10 @@ void BTNode<T>::printTree() {
  * Ideally, the head node hast depth of 0, and each row of children has increasing depth
  */
 template <class T>
-void BTNode<T>::calcDepth(lluint initialDepth)
+void BTNode<T>::calcDepth(std::size_t initialDepth)
 {
 	_depth = initialDepth;
-	for (auto child : _children)
+	for (auto & child : _children)
 	{
 		child->calcDepth(initialDepth+1);
 	}
@@ -140,7 +135,7 @@ void BTNode<T>::calcDepth(lluint initialDepth)
  * of children is bigger or smaller than the parent
  */
 template <class T>
-lluint BTNode<T>::calcWidth()
+std::size_t BTNode<T>::calcWidth()
 {
 	if (_children.empty()) // If there are no children
 	{
@@ -167,24 +162,28 @@ lluint BTNode<T>::calcWidth()
  * It helps iterating through nodes at the same depth
  */
 template <class T>
-void BTNode<T>::groupNodesByDepth(std::vector<std::list<BTNode *> *> & levels, BTNode * head) {
-	std::list<BTNode *> queue;
-	queue.push_back(head);
-	BTNode * nd;
+void BTNode<T>::groupNodesByDepth(std::vector<std::unique_ptr<std::list<std::shared_ptr<BTNode>>>> & levels, std::shared_ptr<BTNode<T>> thisHead) {
+	std::list<std::shared_ptr<BTNode>> queue;
+	std::shared_ptr<BTNode> nd;
+	
+	queue.push_back(thisHead);
 	
 	while (!queue.empty())
 	{
 		// Traverse
 		nd = queue.front();
 		queue.pop_front();
-		for (BTNode * & child : nd->_children)
+		for (auto & child : nd->_children)
 		{
 			queue.push_back(child);
 		}
 		// Add layers to the levels if it is not deep enough
 		while (levels.size() <= nd->_depth)
 		{
-			levels.push_back(new std::list<BTNode *>());
+			// Create unique pointer to a new layer (that is: a new List of BTNode pointers)
+			std::unique_ptr<std::list<std::shared_ptr<BTNode>>> layer(new std::list<std::shared_ptr<BTNode>>());
+			// Move the unique pointer to the vector (C++11 compatible)
+			levels.push_back(std::move(layer));
 		}
 		levels[nd->_depth]->push_back(nd);
 	}
@@ -195,7 +194,7 @@ void BTNode<T>::groupNodesByDepth(std::vector<std::list<BTNode *> *> & levels, B
  * in one pass (Recursive)(Algorithm).
  */
 template <class T>
-lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
+std::size_t BTNode<T>::assignPositionsToNodes(std::size_t blockStart)
 {
 	// Block Data
 	_fbp = blockStart;
@@ -209,8 +208,8 @@ lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
 		_mcp = (_fcp + _lcp) / 2; // left aligning;
 		
 		// Then, do the children
-		lluint childrenBlockStart = blockStart + (_wblock - _wchild) / 2;
-		for (BTNode * & nd : _children)
+		std::size_t childrenBlockStart = blockStart + (_wblock - _wchild) / 2;
+		for (std::shared_ptr<BTNode> & nd : _children)
 		{
 			childrenBlockStart = nd->assignPositionsToNodes(childrenBlockStart);
 		}
@@ -218,8 +217,8 @@ lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
 	else // if the combination of children is longer than this node
 	{
 		// Do the children first
-		lluint childrenBlockStart = blockStart + (_wblock - _wchild) / 2;
-		for (BTNode * & nd : _children)
+		std::size_t childrenBlockStart = blockStart + (_wblock - _wchild) / 2;
+		for (std::shared_ptr<BTNode> & nd : _children)
 		{
 			childrenBlockStart = nd->assignPositionsToNodes(childrenBlockStart);
 		}
@@ -238,8 +237,8 @@ lluint BTNode<T>::assignPositionsToNodes(lluint blockStart)
  * Print line of nodes. This also prints underscores to draw the branches
  */
 template <class T>
-void BTNode<T>::printLine(lluint ln, std::vector<std::list<BTNode *> *> & levels) {
-	for (lluint c = 0; c < _wblock; c++)
+void BTNode<T>::printLine(std::size_t ln, std::vector<std::unique_ptr<std::list<std::shared_ptr<BTNode>>>> & levels) {
+	for (std::size_t c = 0; c < _wblock; c++)
 	{
 		if (CisParentFirstCharacter(c, levels[ln]))
 		{
@@ -261,8 +260,8 @@ void BTNode<T>::printLine(lluint ln, std::vector<std::list<BTNode *> *> & levels
  * Prints in the space between lines. This prints 3 simbols '/', '\', '|' and spaces.
  */
 template <class T>
-void BTNode<T>::printPreline(lluint ln, std::vector<std::list<BTNode *> *> & levels) {
-	for (lluint c = 0; c < _wblock; c++)
+void BTNode<T>::printPreline(std::size_t ln, std::vector<std::unique_ptr<std::list<std::shared_ptr<BTNode>>>> & levels) {
+	for (std::size_t c = 0; c < _wblock; c++)
 	{
 		if (CisCenterChildren(c, levels[ln]))
 		{
@@ -292,9 +291,9 @@ void BTNode<T>::printPreline(lluint ln, std::vector<std::list<BTNode *> *> & lev
  * TODO: add in-out (by ref) parameter to function for the parent node (to avoid iteration if true)
  */
 template <class T>
-bool BTNode<T>::CisParentFirstCharacter(lluint c, std::list<BTNode *> * level)
+bool BTNode<T>::CisParentFirstCharacter(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & level)
 {
-	for (BTNode * & nd : *level)
+	for (std::shared_ptr<BTNode> & nd : *level)
 	{
 		if (nd->_fcp == c)
 			return true;
@@ -306,10 +305,10 @@ bool BTNode<T>::CisParentFirstCharacter(lluint c, std::list<BTNode *> * level)
  * Print the node starting at c in the layer passed and return the number of characters written.
  */
 template <class T>
-lluint BTNode<T>::printNodeStartingAt(lluint c, std::list<BTNode *> * level)
+std::size_t BTNode<T>::printNodeStartingAt(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & level)
 {
 	// Find corresponding node
-	for (BTNode * & nd : * level)
+	for (std::shared_ptr<BTNode> & nd : * level)
 	{
 		if (nd->_fcp == c)
 		{
@@ -325,16 +324,16 @@ lluint BTNode<T>::printNodeStartingAt(lluint c, std::list<BTNode *> * level)
  * If so, an underscore mus be printed
  */
 template <class T>
-bool BTNode<T>::CisBetweenChildrenAndParent(lluint c, std::list<BTNode *> * parent)
+bool BTNode<T>::CisBetweenChildrenAndParent(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & parent)
 {
-	for (BTNode * & nd : *parent)
+	for (std::shared_ptr<BTNode> & nd : *parent)
 	{
 		if (nd->_children.empty())
 		{
 			continue;
 		}
-		lluint minCp = nd->_children.front()->_mcp;
-		lluint maxCp = nd->_children.back( )->_mcp;
+		std::size_t minCp = nd->_children.front()->_mcp;
+		std::size_t maxCp = nd->_children.back( )->_mcp;
 		if (c > minCp && c < maxCp)
 			return true;
 	}
@@ -347,9 +346,9 @@ bool BTNode<T>::CisBetweenChildrenAndParent(lluint c, std::list<BTNode *> * pare
  * TODO: add in-out (by ref) children
  */
 template <class T>
-bool BTNode<T>::CisCenterChildren(lluint c, std::list<BTNode *> * children)
+bool BTNode<T>::CisCenterChildren(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & children)
 {
-	for (BTNode * & nd : * children)
+	for (std::shared_ptr<BTNode> & nd : * children)
 	{
 		if (nd->_mcp == c)
 			return true;
@@ -362,18 +361,18 @@ bool BTNode<T>::CisCenterChildren(lluint c, std::list<BTNode *> * children)
  * of a vertical bar '|', a slash '/', or a backslash '\'. 
  */
 template <class T>
-int BTNode<T>::parentPositionRelToChildren(lluint c, std::list<BTNode *> * parent, std::list<BTNode *> * children)
+int BTNode<T>::parentPositionRelToChildren(std::size_t c, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & parent, std::unique_ptr<std::list<std::shared_ptr<BTNode>>> & children)
 {
-	BTNode * dad = nullptr;
-	BTNode * kid = nullptr;
-	for (BTNode * & nd : *parent) // Find Parent
+	std::shared_ptr<BTNode> dad = nullptr;
+	std::shared_ptr<BTNode> kid = nullptr;
+	for (std::shared_ptr<BTNode> & nd : *parent) // Find Parent
 	{
 		if ((c >= nd->_fbp) && (c <= nd->_lbp))
 		{
 			dad = nd;
 		}
 	}
-	for (BTNode * & nd : *children) // Find children
+	for (auto & nd : *children) // Find children
 	{
 		if ((c >= nd->_fbp) && (c <= nd->_lbp))
 		{
@@ -393,7 +392,7 @@ int BTNode<T>::parentPositionRelToChildren(lluint c, std::list<BTNode *> * paren
  * Print the node data through the imported function and return its length
  */
 template <class T>
-lluint BTNode<T>::printNodeData() {
+std::size_t BTNode<T>::printNodeData() {
 	std::cout << getData();
 	return _wself; // Return the number of characters printed
 }
@@ -425,4 +424,24 @@ void BTNode<T>::printRightChildren() {
 template <class T>
 void BTNode<T>::printVerticalChildren() {
 	std::cout << "|";
+}
+
+
+/**
+ * Tree Class Functions
+ */
+template <class T>
+BTTree<T>::BTTree(T* head, childrenGetterFcn f1, dataGetterFcn f2)
+{
+	// Configure the Node class with the getter functions
+	BTNode<T>::initializeClass(f1, f2);
+	// Initialize the smart pointer with a new BTNode (head) 
+	_head = std::shared_ptr<BTNode<T>>(new BTNode<T>(head));
+}
+
+template <class T>
+void BTTree<T>::print()
+{
+	// Consider using the std::shared_ptr_of_this()
+	_head->printTree(_head);
 }

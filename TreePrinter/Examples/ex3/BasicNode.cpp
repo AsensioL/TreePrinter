@@ -30,11 +30,11 @@ void BasicNode::addChildren(BasicNode *nd) {
 	nd->setParent(this);
 }
 
-const std::list<BasicNode*> & BasicNode::getChildren() {
+std::list<BasicNode*> BasicNode::getChildren() {
 	return _children;
 }
 
-const std::string & BasicNode::getData() {
+std::string BasicNode::getData() {
 	return _data;
 }
 
